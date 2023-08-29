@@ -1,0 +1,88 @@
+ 
+  <script>
+      
+    function addToFavorites(slug, id){
+
+      // change favorite icon styling
+      var textContent = document.getElementById('fav'+id).textContent;
+
+
+      //on the index page a duplicated products listing can occurs
+      var duplicates = document.getElementsByName(slug);
+
+      if (textContent === 'favorite'){
+
+        if (duplicates.length > 1){
+            for (var i=0; i<duplicates.length; i++){
+                duplicates[i].style.color= "";
+                duplicates[i].textContent= "favorite_border";
+                duplicates[i].disabled= true;
+           }
+        } else {
+            document.getElementById('fav'+id).style.color= "";
+            document.getElementById('fav'+id).textContent= "favorite_border";
+            $("fav"+id).attr("disabled", true);
+        }
+
+      } else {
+
+        if (duplicates.length > 1){
+            for (var i=0; i<duplicates.length; i++){
+                duplicates[i].style.color= "#FE4344";
+                duplicates[i].textContent= "favorite";
+                duplicates[i].disabled= true;
+           }
+        } else {
+            document.getElementById('fav'+id).style.color= "#FE4344";
+            document.getElementById('fav'+id).textContent= "favorite";
+            $("fav"+id).attr("disabled", true);
+        }
+      }
+
+      // send the post request to process the favorite article
+       $.ajax({
+        url: "{% url 'pages:add_to_favorites' %}",
+        type: 'POST',
+        cache: false,
+        data: {
+          'slug': slug,
+          'csrfmiddlewaretoken': '{{csrf_token}}' 
+        },
+        dataType: 'json',
+        success: function (data) {
+          $("fav"+id).attr("disabled", false);
+          if (data){
+            // enable the favorites icons again
+            if (duplicates.length > 1){
+                for (var i=0; i<duplicates.length; i++){
+                    duplicates[i].disabled= false;
+               }
+            } else {
+                $("fav"+id).attr("disabled", false);
+            }
+
+            // change the nav bar favorites icon styles
+            if (data.counts != 0){
+              document.getElementById('favBar').style.color= "#FE4344";
+              document.getElementById('favBar').textContent= "favorite";
+              document.getElementById('favBarMobile').style.color= "#FE4344";
+              document.getElementById('favBarMobile').textContent= "favorite";
+            } else {
+              document.getElementById('favBar').style.color= "";
+              document.getElementById('favBar').textContent= "favorite_border";
+              document.getElementById('favBarMobile').style.color= "";
+              document.getElementById('favBarMobile').textContent= "favorite_border";
+            }
+          }
+        },
+        error: 
+          function(xhr){
+              alert("Error: " + xhr.statusText);
+              //alert(xhr.responseText) --> to get the full details of error
+              return false;
+              }
+        });
+    }
+    
+
+    </script>

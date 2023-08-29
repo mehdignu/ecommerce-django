@@ -1,0 +1,121 @@
+{% load static %}
+{% load cart_template_tags %}
+{% if not checkout %}
+
+
+<!-- Navbar 3 Level (Light)-->
+<header class="box-shadow-sm">
+    <!-- Topbar mobile -->
+    <div class="topbar topbar-dark bg-dark">
+        <div class="container">
+            <div class="topbar-text dropdown d-md-none"><a class="topbar-link dropdown-toggle" href="#" data-toggle="dropdown">Useful links</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="tel:21077323"><i class="czi-support text-muted mr-2"></i>(+216) 21 077 323</a></li>
+                </ul>
+            </div>
+            <div class="topbar-text text-nowrap d-none d-md-inline-block"><i class="czi-support"></i><span class="text-muted mr-1">Support</span><a class="topbar-link" href="tel:21077323">(+216) 21 077 323</a></div>
+            <div class="cz-carousel cz-controls-static d-none d-md-block">
+                <div class="cz-carousel-inner" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;nav&quot;: false}">
+                    <div class="topbar-text">Free shipping for order over 150 TND</div>
+                    <div class="topbar-text">We return money within 30 days</div>
+                    <div class="topbar-text">Friendly 24/7 customer support</div>
+                </div>
+            </div>
+            <div class="ml-3 text-nowrap"><a class="topbar-link mr-4 d-none d-md-inline-block" href="#"><i class="czi-locked"></i>Secure ordering</a>
+             
+            </div>
+        </div>
+    </div>
+    <!-- Remove "navbar-sticky" class to make navigation bar scrollable with the page. --> 
+    <div class="navbar-sticky bg-light">
+        <div class="navbar navbar-expand-lg navbar-light">
+            <div class="container">
+                <a class="navbar-brand d-none d-sm-block mr-3 flex-shrink-0" href="/" style="min-width: 7rem;"><img width="142" src="{% static 'img/logo-light-wmn.png' %}" alt="women" /></a>
+                <a class="navbar-brand d-sm-none mr-2" href="/" style="min-width: 4.625rem;"><img width="74" src="{% static 'img/wmn.png' %}" alt="women" /></a>
+                    <form class="input-group-overlay d-none d-lg-flex mx-4" action="{% url 'pages:search' %}" method="POST">
+                        {% csrf_token %}
+                        {{true|get_search_form}}
+                        <div class="input-group-append-overlay"><button type="submit" class="input-group-text"><i class="czi-search"></i></button></div>
+                    </form>
+                <div class="navbar-toolbar d-flex flex-shrink-0 align-items-center">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse"><span class="navbar-toggler-icon"></span></button><a class="navbar-tool navbar-stuck-toggler" href="#"><span class="navbar-tool-tooltip">Expand menu</span>
+            <div class="navbar-tool-icon-box"><i class="navbar-tool-icon czi-menu"></i></div></a>
+            <a class="navbar-tool d-none d-lg-flex" href="{% url 'pages:wishlist' %}"><span class="navbar-tool-tooltip">Wishlist</span>
+
+            {% with favorites_count=request|count_favorites  %}
+
+            {% if favorites_count > 0 %}
+
+                <div class="navbar-tool-icon-box"><i id="favBar" class="navbar-tool-icon material-icons md-48" style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #FE4344;">favorite</i></div></a>
+            {% else %}
+                <div class="navbar-tool-icon-box"><i id="favBar" class="navbar-tool-icon material-icons md-48" style="margin: 0; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">favorite_border</i></div></a>
+            {%endif%}
+            {% endwith %}
+
+
+                    <div class="navbar-tool dropdown ml-3">
+                        {% with cart_count=request|cart_item_count  %}
+
+                        {% if cart_count > 0 %}
+
+                        <a class="navbar-tool-icon-box bg-secondary dropdown-toggle" href="{% url 'order:cart' %}"><span class="navbar-tool-label">{{ cart_count }}</span><i class="navbar-tool-icon czi-cart"></i></a>
+                        {% else %}
+                        <a class="navbar-tool-icon-box bg-secondary dropdown-toggle" href="{% url 'order:cart' %}"><i class="navbar-tool-icon czi-cart"></i></a>
+                        {%endif%}
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar navbar-expand-lg navbar-light navbar-stuck-menu mt-n2 pt-0 pb-2">
+            <div class="container">
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <!-- Search-->
+                    <form class="input-group-overlay d-lg-none my-3" action="{% url 'pages:search' %}" method="POST">
+                        {% csrf_token %}
+                        {{true|get_mobile_search_form}}
+                        <div class="input-group-prepend-overlay"><button type="submit" class="input-group-text"><i class="czi-search"></i></button></div>
+                    </form>
+                  
+                    <!-- Primary menu-->
+                    <ul class="navbar-nav">
+
+                        {% with categories=context|get_categories  %}
+                            {% for category, key in categories.items %}
+                                <a class="nav-link" href="{% url 'pages:products' category=category %}" >{{category}}</a>
+                            {% endfor %}
+                        {% endwith %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+{% else %}
+<header class="box-shadow-sm">
+    <!-- Topbar-->
+    <div class="topbar topbar-dark bg-dark">
+        <div class="container">
+            <div class="topbar-text dropdown d-md-none"><a class="topbar-link dropdown-toggle" href="#" data-toggle="dropdown">Useful links</a>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="tel:21077323"><i class="czi-support text-muted mr-2"></i>(+216) 21 077 323</a></li>
+                </ul>
+            </div>
+            <div class="topbar-text text-nowrap d-none d-md-inline-block"><i class="czi-support"></i><span class="text-muted mr-1">Support</span><a class="topbar-link" href="tel:00331697720">(00) 33 169 7720</a></div>
+            <div class="cz-carousel cz-controls-static d-none d-md-block">
+                <div class="cz-carousel-inner" data-carousel-options="{&quot;mode&quot;: &quot;gallery&quot;, &quot;nav&quot;: false}">
+                    <div class="topbar-text">Free shipping for order over 150 TND</div>
+                    <div class="topbar-text">We return money within 30 days</div>
+                    <div class="topbar-text">Friendly 24/7 customer support</div>
+                </div>
+            </div>
+            <div class="ml-3 text-nowrap"><a class="topbar-link mr-4 d-none d-md-inline-block" href="#"><i class="czi-locked"></i>Secure ordering</a>
+             
+            </div>
+           
+        </div>
+    </div>
+  
+</header>
+{% endif %}

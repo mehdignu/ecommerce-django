@@ -1,0 +1,59 @@
+{% load cart_template_tags %}
+
+<!-- Sidebar-->
+<aside class="col-lg-4 pt-4 pt-lg-0">
+    <div class="cz-sidebar-static rounded-lg box-shadow-lg ml-lg-auto">
+      <div class="widget mb-3">
+        <h2 class="widget-title text-center">Order summary</h2>
+
+          {% for order in order_products.products.all %}
+
+
+          {% with photo=order.product.id|cart_item_photos:order.color  %}
+
+        <div class="media align-items-center pb-2 border-bottom"><span class="d-block mr-2"><img width="64" src="/media/{{photo}}" alt="Product"/></span>
+         
+         {% endwith %}
+          <div class="media-body">
+            <h6 class="widget-product-title">{{ order.product.title }}</h6>
+            <div class="widget-product-meta"><span class="text-accent mr-2">
+              
+              {% if order.product.discount_price %}
+                {% include 'partials/_checkout_price.html' with price=order.product.discount_price %}
+              {% else %}
+                {% include 'partials/_checkout_price.html' with price=order.product.price %}
+              {% endif %}
+
+            </span><span class="text-muted">x {{ order.quantity }}</span></div>
+          
+            </div>
+        </div>
+       
+        {% endfor %}
+      </div>
+      <ul class="list-unstyled font-size-sm pb-2 border-bottom">
+        <li class="d-flex justify-content-between align-items-center"><span class="mr-2">Subtotal:</span><span class="text-right">
+          {% include 'partials/_checkout_price.html' with price=prices.products_total_sum %}
+        
+        </span></li>
+          
+          
+          {% if prices.shipping_price %}
+        <li class="d-flex justify-content-between align-items-center"><span class="mr-2">Shipping with {{shipping}}:</span><span class="text-right">
+          
+          {% include 'partials/_checkout_price.html' with price=prices.shipping_price %}
+
+        </span></li>
+        {% else %}
+        <li class="d-flex justify-content-between align-items-center"><span class="mr-2">Shipping:</span><span class="text-right">—</span></li>
+
+        {% endif %}
+      </ul>
+      <h3 class="font-weight-normal text-center my-4">
+
+        {% include 'partials/_checkout_price.html' with price=prices.total_sum %}
+      
+      </h3>
+     
+    </div>
+  </aside>

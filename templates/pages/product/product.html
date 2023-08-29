@@ -1,0 +1,371 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% load crispy_forms_tags %}
+{% load cart_template_tags %}
+
+{% block head_title %}{{object.title}}{% endblock %}
+
+{% block extra_head %} 
+    <meta property="og:url"                content="{{ request.scheme }}://{{ request.META.HTTP_HOST }}{{object.get_absolute_url}}" />
+    <meta property="og:type"               content="article" />
+    <meta property="og:title"              content="{{object.title }} - " />
+    <meta property="og:description"        content="{{object.description|striptags}}" />
+
+
+    {% if object.category == 'cosmetic' %}
+    <meta property="og:image" content="/media/{{object.photo_main}}" />
+
+    {%else%}
+        
+        <meta property="og:image" content="/media/{{object.get_main_photo}}" />
+        
+        {% endif %}
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Title-->
+<div class="page-title-overlap bg-dark pt-4">
+    <div class="container d-lg-flex justify-content-between py-2 py-lg-3">
+        <div class="order-lg-2 mb-3 mb-lg-0 pt-lg-2">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb breadcrumb-light flex-lg-nowrap justify-content-center justify-content-lg-start">
+                    <li class="breadcrumb-item"><a class="text-nowrap" href="/"><i class="czi-home"></i>Home</a></li>
+                    <li class="breadcrumb-item text-nowrap"><a href="{% url 'pages:products' category=details.category_value %}">{{details.category_value}}</a>
+                    </li>
+                    <li class="breadcrumb-item text-nowrap active" aria-current="page">{{object.title }}</li>
+                </ol>
+            </nav>
+        </div>
+        <div class="order-lg-1 pr-lg-4 text-center text-lg-left">
+            <h1 class="h3 text-light mb-0">{{object.title }}</h1>
+        </div>
+    </div>
+</div>
+<!-- Page Content-->
+<div class="container">
+    <!-- Gallery + details-->
+    <div class="bg-light box-shadow-lg rounded-lg px-4 py-3 mb-5">
+        <div class="px-lg-3">
+            <div class="row">
+                <!-- Product gallery-->
+                <div class="col-lg-7 pr-lg-0 pt-lg-4">
+                    <div class="cz-product-gallery">
+                        <div class="cz-preview order-sm-2">
+                            {% for photo_id, photo in details.photos.items %}
+                                <div class="cz-preview-item {% if forloop.first %} active {% endif %}" id="{{photo_id}}"><img src="/media/{{ photo }}" data-zoom="/media/{{photo }}" alt="Product image">
+                                    <div class="cz-image-zoom-pane"></div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="cz-thumblist order-sm-1">
+                            {% for photo_id, photo in details.photos.items %}
+                                {% if photo|length > 0 %}
+                                    <a class="cz-thumblist-item {% if forloop.first %} active {% endif %}" href="#{{photo_id}}"><img src="/media/{{ photo }}" alt="Product thumb"></a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Product details-->
+                <div class="col-lg-5 pt-4 pt-lg-0">
+                    <div class="product-details ml-auto pb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <a href="#reviews" data-scroll role="button">
+                                <span class="d-inline-block font-size-sm text-body align-middle mt-1 ml-1"></span></a>
+                        </div>
+
+                        <div class="mb-3">
+                        
+                        {% if object.discount_price %}
+
+                            <!-- discount price -->
+
+                            {% with object.discount_price|split:"." as price_decimals %}
+                                    
+                                <span class="h3 font-weight-normal text-accent mr-1">{{price_decimals|first}}
+
+                                {% if price_decimals|last != '0' %}
+                                <small>.{{ price_decimals|last }}</small>
+                                {% endif %}
+                                TND</span>
+
+                            {% endwith %}
+
+                            <!-- deleted actual price -->
+
+                            {% with object.price|split:"." as price_decimals %}
+                            <del class="text-muted font-size-lg mr-3">{{ price_decimals|first }}
+                                {% if price_decimals|last != '0' %}
+                                <small>.{{ price_decimals|last }}</small>
+                                {% endif %}
+                                TND</del>
+                            
+                                <span class="badge badge-danger badge-shadow align-middle mt-n2">Sale</span>
+
+                            {% endwith %}
+                            </div>
+
+
+                            {% else %}
+
+                            {% with object.price|split:"." as price_decimals %}
+                           <span class="h3 font-weight-normal text-accent mr-1">{{ price_decimals|first }}
+                                {% if price_decimals|last != '0' %}
+                                <small>.{{ price_decimals|last }}</small>
+                                {% endif %}
+                                TND</span>
+                            {% endwith %}
+                            {% endif %}
+                    
+                    </div>
+
+                    {% if object.category != 'cosmetic' %}
+                        <div class="font-size-sm mb-4"><span class="text-heading font-weight-medium mr-1">Color:</span><span class="text-muted" id="colorOption">{{details.color}}</span></div>
+
+                        <div class="position-relative mr-n4 mb-3">
+                            {% for color in object.get_hashed_colors%}
+                                <div class="custom-control custom-option custom-control-inline mb-2">
+                                    <input href="{% url 'stock:product_color' slug=object.slug color=color.name %}" class="custom-control-input" type="radio" name="color" data-type="number" id="{{color.name}}" data-label="colorOption" value="{{color.name}}" {% if details.color == color.name %} checked {% endif %} >
+                                    <label class="custom-option-label rounded-circle" for="{{color.name}}"><span class="custom-option-color rounded-circle" style="background-color: {{color.value}}"></span></label>
+                                </div>
+                            {% endfor %}
+
+                                {% else %}
+
+                                <div class="position-relative mr-n4 mb-3">
+                                       
+                            {% endif %}
+
+                            {% with isFavorite=request|isFavorite:object.slug %}
+
+                        {% if not soldout %}
+                        
+                        <div class="product-badge product-available mt-n1"><i class="czi-security-check"></i>Product available</div>
+                       
+                        </div>
+
+                        <form action="{% url 'stock:product_color' slug=object.slug color=details.color %}" class="mb-grid-gutter" method="POST">
+                         
+                         
+                            {% csrf_token %}
+                            <div class="form-group">
+
+                                {{ form|crispy }}
+                            
+                            </div>
+
+                            <div class="form-group d-flex align-items-center">
+                                <button class="btn btn-primary btn-shadow btn-block" type="submit"><i class="czi-cart font-size-lg mr-2"></i>Add to Cart </button>
+                            
+                            {% if isFavorite %}
+
+                            <a onclick="this.blur();addToFavorites('{{object.slug}}', '0')" class="btn-wishlist ml-3" type="button" data-toggle="tooltip" title="Add to wishlist">
+                                    <i class="material-icons md-48" style="font-size:14px;color: #FE4344;" id="fav0" name="{{object.slug}}">favorite</i>
+                                </a>
+                            
+                            {% else %}
+                            <a onclick="this.blur();addToFavorites('{{object.slug}}', '0')" class="btn-wishlist ml-3" type="button" data-toggle="tooltip" title="Add to wishlist">
+                                <i class="material-icons md-48" style="font-size:14px;" id="fav0" name="{{object.slug}}">favorite_border</i>
+                            </a>
+                            
+                            {% endif %}
+
+                            </div>
+                        </form>
+
+                        {% else %}
+                        
+
+                        <div class="product-badge product-not-available mt-n1"><i class="czi-security-check"></i>Product not available</div>
+                       
+                        </div>
+                        
+                        <form action="{% url 'stock:product_color' slug=object.slug color=details.color %}" class="mb-grid-gutter" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                
+                                {{ form|crispy }}
+                
+                            </div>
+
+                            <div class="form-group d-flex align-items-center">
+                                <button class="btn btn-primary btn-shadow btn-block" type="submit"><i class="czi-mail font-size-lg mr-2"></i>Subscribe</button>
+                                
+                                                            {% if isFavorite %}
+
+                            <a onclick="this.blur();addToFavorites('{{object.slug}}', '0')" class="btn-wishlist ml-3" type="button" data-toggle="tooltip" title="Add to wishlist">
+                                    <i class="material-icons md-48" style="font-size:14px;color: #FE4344;" id="fav0" name="{{object.slug}}">favorite</i>
+                                </a>
+                            
+                            {% else %}
+                            <a onclick="this.blur();addToFavorites('{{object.slug}}', '0')" class="btn-wishlist ml-3" type="button" data-toggle="tooltip" title="Add to wishlist">
+                                <i class="material-icons md-48" style="font-size:14px;" id="fav0" name="{{object.slug}}">favorite_border</i>
+                            </a>
+                            
+                            {% endif %}
+
+                            </div>
+                        </form>
+                        {% endif %}
+
+                      {% endwith %}
+                        
+                      <!-- Product panels-->
+                        <div class="accordion mb-4" id="productPanels">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="accordion-heading"><a href="#productInfo" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="productInfo"><i class="czi-announcement text-muted font-size-lg align-middle mt-n1 mr-2"></i>Product info<span class="accordion-indicator"></span></a></h3>
+                                </div>
+                                <div class="collapse show" id="productInfo" data-parent="#productPanels">
+                                    <div class="card-body">
+                                        {{object.description|safe}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="accordion-heading"><a class="collapsed" href="#shippingOptions" role="button" data-toggle="collapse" aria-expanded="true" aria-controls="shippingOptions"><i class="czi-delivery text-muted lead align-middle mt-n1 mr-2"></i>Shipping options<span class="accordion-indicator"></span></a></h3>
+                                </div>
+                                <div class="collapse" id="shippingOptions" data-parent="#productPanels">
+                                    <div class="card-body font-size-sm">
+                                        <div class="d-flex justify-content-between border-bottom pb-2">
+                                            <div>
+                                                <div class="font-weight-semibold text-dark">Tunisia Express</div>
+                                                <div class="font-size-sm text-muted">3 - 5 jours</div>
+                                            </div>
+                                            <div>7 TND</div>
+                                        </div>
+                                      
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="accordion-heading"><a class="collapsed" href="#localStore" role="button" aria-expanded="true" ><i class="czi-location text-muted font-size-lg align-middle mt-n1 mr-2"></i>11 Rue Charles de Gaulle, 2ème étage</a></h3>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <!-- Sharing-->
+                        <h6 class="d-inline-block align-middle font-size-base my-2 mr-2">Share:</h6><a class="share-btn sb-facebook my-2" href="https://www.facebook.com/sharer/sharer.php?u={{ request.scheme }}://{{ request.META.HTTP_HOST }}{{object.get_absolute_url}}" target="_blank""><i class="czi-facebook"></i>Facebook</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+{% if suggestions_style_with %}
+<!-- Product carousel (Style with)-->
+<div class="container pt-5">
+    <h2 class="h3 text-center pb-4">Style with</h2>
+    <div class="cz-carousel cz-controls-static cz-controls-outside">
+        <div class="cz-carousel-inner" data-carousel-options="{&quot;items&quot;: 2, &quot;controls&quot;: true, &quot;nav&quot;: false, &quot;autoHeight&quot;: true, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;500&quot;:{&quot;items&quot;:2, &quot;gutter&quot;: 18},&quot;768&quot;:{&quot;items&quot;:3, &quot;gutter&quot;: 20}, &quot;1100&quot;:{&quot;items&quot;:4, &quot;gutter&quot;: 30}}}">
+                {% for style_with in suggestions_style_with %}
+
+                    <!-- Product-->
+                    <div>
+                        <div class="card product-card card-static">
+                            <button class="btn-wishlist btn-sm" type="button" data-toggle="tooltip" data-placement="left" title="Add to wishlist"><i class="czi-heart"></i></button>
+                            {% if style_with.category == 'cosmetic' %}
+                                <a class="card-img-top d-block overflow-hidden" href="{{style_with.get_absolute_url}}"><img src="/media/{{style_with.photo_main}}" alt="Product"></a>
+                                <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=style_with.category %}">{{style_with.get_category_display}}</a>
+                                    {%else%}
+                                <a class="card-img-top d-block overflow-hidden" href="{{style_with.get_absolute_url}}"><img src="/media/{{style_with.get_main_photo}}" alt="Product"></a>
+                                <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=style_with.category|get_category_from_key %}">{{style_with.get_category_display}}</a>
+                            {% endif %}
+                                <h3 class="product-title font-size-sm"><a href="{{style_with.get_absolute_url}}"> {{style_with.title}}</a></h3>
+                                <div class="d-flex justify-content-between">
+                                    {% include "partials/_price.html" with product=style_with %}                                                      
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+                {% endfor %}
+
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% if suggestions_may_like %}
+
+<!-- Product carousel (You may also like)-->
+<div class="container py-5 my-md-3">
+    <h2 class="h3 text-center pb-4">You may also like</h2>
+    <div class="cz-carousel cz-controls-static cz-controls-outside">
+        <div class="cz-carousel-inner" data-carousel-options="{&quot;items&quot;: 2, &quot;controls&quot;: true, &quot;nav&quot;: false, &quot;autoHeight&quot;: true, &quot;responsive&quot;: {&quot;0&quot;:{&quot;items&quot;:1},&quot;500&quot;:{&quot;items&quot;:2, &quot;gutter&quot;: 18},&quot;768&quot;:{&quot;items&quot;:3, &quot;gutter&quot;: 20}, &quot;1100&quot;:{&quot;items&quot;:4, &quot;gutter&quot;: 30}}}">
+            
+                {% for style_with in suggestions_may_like %}
+
+                    <!-- Product-->
+                    <div>
+                        <div class="card product-card card-static">
+                            <button class="btn-wishlist btn-sm" type="button" data-toggle="tooltip" data-placement="left" title="Add to wishlist"><i class="czi-heart"></i></button>
+                            {% if style_with.category == 'cosmetic' %}
+                                <a class="card-img-top d-block overflow-hidden" href="{{style_with.get_absolute_url}}"><img src="/media/{{style_with.photo_main}}" alt="Product"></a>
+                                <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=style_with.category %}">{{style_with.get_category_display}}</a>
+                                    {%else%}
+                                <a class="card-img-top d-block overflow-hidden" href="{{style_with.get_absolute_url}}"><img src="/media/{{style_with.get_main_photo}}" alt="Product"></a>
+                                <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=style_with.category|get_category_from_key %}">{{style_with.get_category_display}}</a>
+                            {% endif %}
+                                <h3 class="product-title font-size-sm"><a href="{{style_with.get_absolute_url}}"> {{style_with.title}}</a></h3>
+                                <div class="d-flex justify-content-between">
+                                    <div class="product-price text-accent">
+                                        {% include "partials/_price.html" with product=style_with %}                  
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+                {% endfor %}
+          
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock content %} 
+
+
+    
+{% block extra_scripts %}
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var x = document.getElementById("files");
+
+            $("input[name='color']").change(function() {
+                var product = $(this).attr('href');
+                try {
+
+                    location.href = product;
+                    
+                    //$('#error').hide();
+                } catch (err) {
+                    $('#error').html(err);
+                    $('#error').show();
+                }
+                return false;
+            });
+            
+            // get the alert message
+            var msg = "{{message_alert.message}}";
+            if(msg.length > 0){
+                $('#btnTrigger').click();
+            }
+        
+        });
+    </script>
+    
+    {% include "partials/scripts/_add_to_favorite_script.html" %}
+
+{% endblock extra_scripts %}

@@ -1,0 +1,60 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>{% block head_title %}{% endblock %}</title>
+    {% block extra_head %} {% endblock %}
+    <!-- SEO Meta Tags-->
+    <meta name="description" content="Shop the latest women fashion">
+    <meta name="keywords" content="vetement femme, veste femme, boutique en ligne vetement femme, women fashion, robe, chemise femme, acheter vetement en ligne, vetement femme en ligne, mode femme, robes, ensemble femme, veste cuir, fashion shop">
+    <meta name="author" content="Mehdi Dridi">
+    <!-- Viewport-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Favicon and Touch Icons-->
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="mask-icon" color="#fe6a6a" href="{% static 'safari-pinned-tab.svg' %}">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <!-- Vendor Styles including: Font Icons, Plugins, etc.-->
+    <link rel="stylesheet" media="screen" href="{% static 'vendor/simplebar/dist/simplebar.min.css' %}" />
+    <link rel="stylesheet" media="screen" href="{% static 'vendor/tiny-slider/dist/tiny-slider.css' %}" />
+    <link rel="stylesheet" media="screen" href="{% static 'vendor/drift-zoom/dist/drift-basic.min.css' %}" />
+    <!-- Main Theme Styles + Bootstrap-->
+    <link rel="stylesheet" media="screen" href="{% static 'css/theme.min.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+
+
+{% include "partials/_navbar.html" %}
+
+<body class="toolbar-enabled">
+
+    {% block content %} {% endblock content %} {% block extra_body %} {% endblock %} 
+
+    {% include "partials/_alert_messages.html" %} 
+    {% include "partials/_footer.html" %} 
+    {% include "partials/_scripts.html" %} 
+
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-TL52FNS7WP"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+        
+            gtag('config', 'G-TL52FNS7WP');
+        </script>
+
+    {% block extra_scripts %}
+   
+    {% endblock extra_scripts %}
+</body>
+
+</html>

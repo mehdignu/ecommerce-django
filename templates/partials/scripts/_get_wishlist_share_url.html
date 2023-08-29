@@ -1,0 +1,32 @@
+ 
+  <script>
+    function getShareLink(){
+
+        // send the post request to process the favorite article
+       $.ajax({
+        url: "{% url 'pages:get_share_url' %}",
+        type: 'POST',
+        cache: false,
+        data: {
+          'csrfmiddlewaretoken': '{{csrf_token}}' 
+        },
+        dataType: 'json',
+        success: function (data) {
+            var linkInput = document.getElementById('linkUrl');
+            var linkCopiedMessage = document.getElementById('copyLink');
+
+            if (data && Object.keys(data).length === 1 && linkCopiedMessage.textContent.length === 0){                
+                linkInput.value = data.url;
+            }
+        },
+        error: 
+          function(xhr){
+              alert("Error: " + xhr.statusText);
+              //alert(xhr.responseText) --> to get the full details of error
+              return false;
+              }
+        });
+     
+    }
+    
+    </script>

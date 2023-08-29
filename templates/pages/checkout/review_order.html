@@ -1,0 +1,166 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% load crispy_forms_tags %}
+{% load cart_template_tags %}
+{% load i18n %}
+
+{% block head_title %}Checkout{% endblock %}
+
+
+{% block content %}
+
+  {% include 'partials/_checkout_title.html' %}
+
+    <!-- Page Content-->
+    <div class="container pb-5 mb-2 mb-md-4">
+      <div class="row">
+        <section class="col-lg-8">
+          <!-- Steps-->
+          <div class="steps steps-light pt-2 pb-3 mb-5"><a class="step-item active">
+              <div class="step-progress"><span class="step-count">1</span></div>
+              <div class="step-label"><i class="czi-cart"></i>Cart</div></a><a class="step-item active">
+              <div class="step-progress"><span class="step-count">2</span></div>
+              <div class="step-label"><i class="czi-user-circle"></i>Your details</div></a><a class="step-item active">
+              <div class="step-progress"><span class="step-count">3</span></div>
+              <div class="step-label"><i class="czi-package"></i>Shipping</div></a><a class="step-item active">
+              <div class="step-progress"><span class="step-count">4</span></div>
+              <div class="step-label"><i class="czi-card"></i>Payment</div></a><a class="step-item active current">
+              <div class="step-progress"><span class="step-count">5</span></div>
+              <div class="step-label"><i class="czi-check-circle"></i>Review</div></a></div>
+          <!-- Order details-->
+          <h2 class="h6 pt-1 pb-3 mb-3 border-bottom">Review your order</h2>
+
+          {% for order in order_products.products.all %}
+
+          <!-- Item-->
+          <div class="d-sm-flex justify-content-between my-4 pb-3 border-bottom">
+            {% with photo=order.product.id|cart_item_photos:order.color  %}
+
+            <div class="media media-ie-fix d-block d-sm-flex text-center text-sm-left"><a class="d-inline-block mx-auto mr-sm-4" style="width: 10rem;"><img src="/media/{{photo}}" alt="Product"></a>
+
+              {% endwith %}
+
+              <div class="media-body pt-2">
+                <h3 class="product-title font-size-base mb-2">{{order.product.title}}</h3>
+                {% if order.product.category != 'cosmetic' %}
+                  <div class="font-size-sm"><span class="text-muted mr-2">Size:</span>{{order.size}}</div>
+                  <div class="font-size-sm"><span class="text-muted mr-2">Color:</span>{{order.color}}</div>
+                {% endif %}
+
+                {% include "partials/_price.html" with product=order.product %}
+             
+              </div>
+            </div>
+            <div class="pt-2 pt-sm-0 pl-sm-3 mx-auto mx-sm-0 text-center text-sm-right" style="max-width: 9rem;">
+              <p class="mb-0"><span class="text-muted font-size-sm">Quantity:</span><span>&nbsp; {{order.quantity}}</span></p>
+              <button class="btn btn-link px-0" type="button"><i class="czi-edit mr-2"></i><a href="/" class="font-size-sm">Edit</a></button>
+            </div>
+          </div>
+
+          {% endfor %}
+          
+          <form id="orderform" action="" method="POST">
+
+            {% csrf_token %}
+
+            {{ wizard.management_form }}
+              {% if wizard.form.forms %}
+                  {{ wizard.form.management_form }}
+                  {% for form in wizard.form.forms %}
+                      {{ form }}
+                  {% endfor %}
+              {% else %}
+                  {{ wizard.form }}
+              {% endif %}
+        
+          <!-- Client details-->
+          <div class="bg-secondary rounded-lg px-4 pt-4 pb-2">
+            <div class="row">
+              <div class="col-sm-6">
+                <h4 class="h6">Shipping to:</h4>
+                <ul class="list-unstyled font-size-sm">
+                  <li><span class="text-muted">Client:&nbsp;</span>{{review_data.customer}}</li>
+                  <li><span class="text-muted">Address:&nbsp;</span>{{review_data.address}}</li>
+                  <li><span class="text-muted">Phone:&nbsp;</span>{{review_data.phone}}</li>
+                </ul>
+              </div>
+              <div class="col-sm-6">
+                <h4 class="h6">Payment method:</h4>
+                <ul class="list-unstyled font-size-sm">
+                  <li>{{review_data.payment}}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Navigation (desktop)-->
+          <div class="d-none d-lg-flex pt-4">
+
+            {% if wizard.steps.prev %}
+          
+            <!-- <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button> -->
+            <div class="w-50 pr-3"><button class="btn btn-secondary btn-block" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}"><i class="czi-arrow-left mt-sm-0 mr-1"></i><span class="d-none d-sm-inline">{% trans "Back to Payment" %}</span><span class="d-inline d-sm-none">Back</span></button></div>
+          
+            {% endif %}
+          <div class="w-50 pl-2"><button  id="complete" class="btn btn-primary btn-block" type="submit" value="{% trans "submit" %}" ><span class="d-none d-sm-inline">Complete Order</span><span class="d-inline d-sm-none">Next</span><i class="czi-arrow-right mt-sm-0 ml-1"></i></button></div>
+        </div>
+
+        </section>
+        
+        {% include "partials/_checkout_sidebar.html" %}
+
+      </div>
+      <!-- Navigation (mobile)-->
+      <div class="row d-lg-none">
+        <div class="col-lg-8">
+          <div class="d-flex pt-4 mt-3">
+            {% if wizard.steps.prev %}
+          
+            <div class="w-50 pr-3"><button class="btn btn-secondary btn-block" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}"><i class="czi-arrow-left mt-sm-0 mr-1"></i><span class="d-none d-sm-inline">{% trans "Back to Payment" %}</span><span class="d-inline d-sm-none">Back</span></button></div>
+          
+            {% endif %}
+
+            <div class="w-50 pl-2"><button id="completeMo" class="btn btn-primary btn-block" type="submit" value="{% trans "submit" %}" ><span class="d-none d-sm-inline">Complete order</span><span class="d-inline d-sm-none">Complete</span><i class="czi-arrow-right mt-sm-0 ml-1"></i></button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+    {% endblock content %}
+
+    {% block extra_scripts %}
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous"></script>
+
+          <script src="https://www.google.com/recaptcha/api.js?render=6LeiAuoZAAAAAPfDpRC1ZE1F4aJpQy_SNCspB2M0"></script>
+          <script>
+            
+
+            grecaptcha.ready(function() {
+              
+                $('#completeMo').on("click",function(e) {
+                  console.log('suci');
+                    $(':input[type=submit]').prop('disabled', true);
+                    e.preventDefault()
+                    grecaptcha.execute('6LeiAuoZAAAAAPfDpRC1ZE1F4aJpQy_SNCspB2M0', {action: 'orderform'}).then(function(token) {
+                        $('#recaptcha').val(token)
+                        $('form#orderform').submit();
+                    });
+                })
+
+                $('#complete').on("click",function(e) {
+                  console.log('suci');
+                    $(':input[type=submit]').prop('disabled', true);
+                    e.preventDefault()
+                    grecaptcha.execute('6LeiAuoZAAAAAPfDpRC1ZE1F4aJpQy_SNCspB2M0', {action: 'orderform'}).then(function(token) {
+                        $('#recaptcha').val(token)
+                        $('form#orderform').submit();
+                    });
+                })
+  
+            });
+           </script>
+
+    {% endblock extra_scripts %}

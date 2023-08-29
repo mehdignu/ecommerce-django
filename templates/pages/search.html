@@ -1,0 +1,190 @@
+{% extends 'base.html' %} 
+{% load cart_template_tags %}
+{% load static %} 
+
+{% block head_title %}Search result{% endblock %}
+
+{% block content %}
+{% if page_obj|length > 0 %}
+
+    <!-- used for shop templates with filters on top-->
+    <div class="bg-dark pt-4 pb-5">
+      <div class="container pt-2 pb-3 pt-lg-3 pb-lg-4">
+        <div class="d-lg-flex justify-content-between pb-3">
+          <div class="order-lg-2 mb-3 mb-lg-0 pt-lg-2">
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb breadcrumb-light flex-lg-nowrap justify-content-center justify-content-lg-start">
+                <li class="breadcrumb-item"><a class="text-nowrap" href="/"><i class="czi-home"></i>Home</a></li>
+               
+                <li class="breadcrumb-item text-nowrap active" aria-current="page">{{ category }}</li>
+              </ol>
+            </nav>
+          </div>
+          <div class="order-lg-1 pr-lg-4 text-center text-lg-left">
+            <h1 class="h3 text-light mb-0">Your search results</h1>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page Content-->
+    <div class="container pb-5 mb-2 mb-md-4">
+      <!-- Toolbar-->
+    
+      <!-- Products grid-->
+      <div class="row pt-3 mx-n2">
+        <!-- Product-->
+        {% for product in page_obj %}
+          <div class="col-lg-3 col-md-4 col-sm-6 px-2 mb-4">
+            <div class="card product-card">
+              {% if product.discount_price %}
+              <span class="badge badge-danger badge-shadow">Sale</span>
+            {% endif %}
+
+            {% with isFavorite=request|isFavorite:product.slug %}      
+            
+            {% if isFavorite %}
+
+                <button onclick="this.blur();addToFavorites('{{product.slug}}', '{{ forloop.counter }}')" class="btn-wishlist btn-sm" type="button" data-toggle="tooltip" data-placement="left" title="Add to wishlist">
+                  <i class="material-icons md-48" style="font-size:14px;color: #FE4344;" id="fav{{ forloop.counter }}" name="{{product.slug}}">favorite</i>
+                </button>
+              
+              {% else %}
+
+                <button onclick="this.blur();addToFavorites('{{product.slug}}', '{{ forloop.counter }}')" class="btn-wishlist btn-sm" type="button" data-toggle="tooltip" data-placement="left" title="Add to wishlist">
+                  <i class="material-icons md-48" style="font-size:14px;" id="fav{{forloop.counter}}" name="{{product.slug}}">favorite_border</i>
+                </button>
+
+              {% endif %}
+
+              {% endwith %}
+              
+              {% if product.category == 'cosmetic' %}
+
+              <a class="card-img-top d-block overflow-hidden" href="{{product.get_absolute_url}}"><img src="/media/{{ product.photo_main }}" alt="Product"></a>
+
+              <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=product.category %}">{{product.category}}</a>
+              
+                <h3 class="product-title font-size-sm"><a href="{{product.get_absolute_url}}">{{product.title}}</a></h3>
+                  <div class="d-flex justify-content-between">
+                    
+                    {% include "partials/_price.html" %}
+
+                  </div>
+                
+              </div>
+
+              {% else %}
+
+              <a class="card-img-top d-block overflow-hidden" href="{{product.get_absolute_url}}"><img src="/media/{{ product.get_main_photo }}" alt="Product"></a>
+
+              <div class="card-body py-2"><a class="product-meta d-block font-size-xs pb-1" href="{% url 'pages:products' category=product.category %}">{{product.get_category_display}}</a>
+              
+                <h3 class="product-title font-size-sm"><a href="{{product.get_absolute_url}}">{{product.title}}</a></h3>
+                  <div class="d-flex justify-content-between">
+                    
+                    {% include "partials/_price.html" %}
+
+                  </div>
+                  {% if product.get_hashed_colors|length > 1 %}
+                      <div class="text-accent"><a class="nav-link-style font-size-ms" href="{{product.get_absolute_url}}">+{{product.get_hashed_colors|length}} couleurs</a></div>
+                      {% else %}
+
+                      <div class="text-accent"><a class="nav-link-style font-size-ms" href="{{product.get_absolute_url}}">1 couleur</a></div>
+
+                      {% endif %}
+              </div>
+
+              {% endif %}
+             
+            </div>
+            <hr class="d-sm-none">
+          </div>
+        {% endfor %}
+      </div>
+    
+      <hr class="my-3">
+
+      <!-- Pagination-->
+       <nav class="d-flex justify-content-between pt-2" aria-label="Page navigation">
+        <ul class="pagination">
+
+          {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="czi-arrow-left mr-2"></i>Prev</a></li>
+
+          {% endif %}
+
+        </ul>
+
+
+        <ul class="pagination">
+        
+        {% if page_obj.number|add:'-1' > 0 %}
+          <li class="page-item d-none d-sm-block"><a class="page-link" href="?page={{ page_obj.number|add:'-1' }}">{{ page_obj.number|add:'-1' }}</a></li>
+        {% endif %}
+        <li class="page-item d-sm-none"><span class="page-link page-link-static">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+
+          <li class="page-item active d-none d-sm-block" aria-current="page"><span class="page-link">{{ page_obj.number }}<span class="sr-only">(current)</span></span></li>
+          {% if page_obj.number|add:'1' <= page_obj.paginator.num_pages %}
+            <li class="page-item d-none d-sm-block"><a class="page-link" href="?page={{ page_obj.number|add:'1' }}">{{ page_obj.number|add:'1' }} </a></li>
+          {% endif %}
+        
+        </ul>
+        <ul class="pagination">
+          {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">Next<i class="czi-arrow-right ml-2"></i></a></li>
+          {% endif %}
+          
+        </ul>
+      </nav>
+    </div>
+
+    {% else %}
+      <!-- Page Content-->
+   <div class="container py-5 mb-lg-3">
+    <div class="row justify-content-center pt-lg-4 text-center">
+      <div class="col-lg-5 col-md-7 col-sm-9"><i class="navbar-tool-icon czi-search" style="font-size: 1.5em;"></i>
+        <h3 class="h5 font-weight-normal mb-4">No Result found for your search</h3>
+       
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="col-xl-8 col-lg-10">
+        <div class="row">
+          <div class="col-sm-4 mb-3"><a class="card h-100 border-0 box-shadow-sm" href="/">
+              <div class="card-body">
+                <div class="media align-items-center"><i class="czi-home text-primary h4 mb-0"></i>
+                  <div class="media-body pl-3">
+                    <h5 class="font-size-sm mb-0">Homepage</h5><span class="text-muted font-size-ms">Return to homepage</span>
+                  </div>
+                </div>
+              </div></a></div>
+          <div class="col-sm-4 mb-3"><a class="card h-100 border-0 box-shadow-sm" href="#">
+              <div class="card-body">
+                <div class="media align-items-center"><i class="czi-search text-success h4 mb-0"></i>
+                  <div class="media-body pl-3">
+                    <h5 class="font-size-sm mb-0">Search</h5><span class="text-muted font-size-ms">Find with advanced search</span>
+                  </div>
+                </div>
+              </div></a></div>
+          <div class="col-sm-4 mb-3"><a class="card h-100 border-0 box-shadow-sm" href="#">
+              <div class="card-body">
+                <div class="media align-items-center"><i class="czi-help text-info h4 mb-0"></i>
+                  <div class="media-body pl-3">
+                    <h5 class="font-size-sm mb-0">Help &amp; Support</h5><span class="text-muted font-size-ms">Visit our help center</span>
+                  </div>
+                </div>
+              </div></a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    {% endif %}
+
+    {% endblock content %}
+
+    {% block extra_scripts %}
+  
+      {% include "partials/scripts/_add_to_favorite_script.html" %}
+
+    {% endblock extra_scripts %}

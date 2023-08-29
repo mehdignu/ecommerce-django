@@ -1,0 +1,27 @@
+
+{% extends 'base.html' %} 
+{% load cart_template_tags %}
+{% load static %} 
+
+{% block head_title %}Contact{% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="success success-primary py-5 px-lg-5 text-center mb-5"><i class="h2 czi-telegram
+            text-primary mb-4"></i>
+            <h1 class="h4 pb-2">Contact</h1>
+            <p class="font-size-md pb-2">
+                
+                {{object_list.0.body|safe}}            
+            </p>
+            
+          </div>
+        
+        </div>
+      </div>
+    </div>
+   
+
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% load cart_template_tags %}
+
+{% if product.discount_price %}
+<div class="product-price">
+
+  <!-- discount price -->
+
+  {% with product.discount_price|split:"." as price_decimals %}
+    <span class="text-accent">{{price_decimals|first}}
+    {% if price_decimals|last != '0' %}
+      <small>.{{ price_decimals|last }}</small>
+    {% endif %}
+    TND</span>
+  {% endwith %}
+
+  <!-- deleted actual price -->
+
+  {% with product.price|split:"." as price_decimals %}
+  <del class="font-size-sm text-muted">{{ price_decimals|first }}
+     {% if price_decimals|last != '0' %}
+      <small>.{{ price_decimals|last }}</small>
+     {% endif %}
+    TND</del>
+  {% endwith %}
+  </div>
+
+
+{% else %}
+
+{% with product.price|split:"." as price_decimals %}
+  <div class="product-price"><span class="text-accent">{{ price_decimals|first }}
+     {% if price_decimals|last != '0' %}
+      <small>.{{ price_decimals|last }}</small>
+     {% endif %}
+    TND</span>
+  </div>
+  {% endwith %}
+{% endif %}

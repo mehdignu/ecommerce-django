@@ -1,0 +1,9 @@
+{% load cart_template_tags %}
+
+{% with price|split:"." as price_decimals %}
+{{price_decimals|first}}
+{% if price_decimals|last != '0' and price_decimals|length > 1 %}
+  <small>.{{ price_decimals|last }}</small>
+{% endif %}
+TND
+{% endwith %}

@@ -1,0 +1,128 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% load crispy_forms_tags %}
+{% load cart_template_tags %}
+
+{% block head_title %}Cart{% endblock %}
+
+
+{% block content %}
+
+<div class="container pb-5 mb-2 mb-md-4">
+    <div class="row">
+      <!-- List of items-->
+      <section class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center pt-3 pb-2 pb-sm-5 mt-1">
+          <h2 class="h6 text-light mb-0">Products</h2><a class="btn btn-outline-primary btn-sm pl-2" href="/"><i class="czi-arrow-left mr-2"></i>Continue shopping</a>
+        </div>
+        {% for order in order_products.products.all  %}
+        <!-- Item-->
+        <div class="d-sm-flex justify-content-between align-items-center my-4 pb-3 border-bottom">
+          {% with photo=order.product.id|cart_item_photos:order.color  %}
+        
+          <div class="media media-ie-fix d-block d-sm-flex align-items-center text-center text-sm-left"><a class="d-inline-block mx-auto mr-sm-4" href="{{order.product.get_absolute_url}}" style="width: 10rem;"><img src="/media/{{photo}}" alt="Product"></a>
+            {% endwith %}
+
+            <div class="media-body pt-2">
+              <h3 class="product-title font-size-base mb-2"><a href="{{order.product.get_absolute_url}}">{{ order.product.title }}</a></h3>
+              {% if order.product.category != 'cosmetic' %}
+                <div class="font-size-sm"><span class="text-muted mr-2">Size:</span>{{ order.size }}</div>
+                <div class="font-size-sm"><span class="text-muted mr-2">Color:</span>{{ order.color }}</div>
+              {% endif %}
+              {% include "partials/_price.html" with product=order.product %}
+              <form action="{% url 'stock:remove_from_cart' slug=order.product.slug color=order.color size=order.size %}" class="mb-grid-gutter" method="POST">
+                {% csrf_token %}
+              <button class="btn btn-link px-0 text-danger" type="submit"><i class="czi-close-circle mr-2"></i><span class="font-size-sm">Remove</span></button>
+              </form>
+
+            </div>
+          </div>
+          <div class="pt-2 pt-sm-0 pl-sm-3 mx-auto mx-sm-0 text-center text-sm-left" style="max-width: 9rem;">
+        
+
+                <div class="form-group mb-0 mb-1">
+                  <div class="d-block  d-inline-flex align-items-center">
+                    
+                    <form  name="increaseForm{{forloop.counter}}" action="{% url 'stock:increase_from_cart' slug=order.product.slug color=order.color size=order.size %}"  method="POST">
+                      {% csrf_token %}
+                      
+                      <span  class="pr-4" onclick="increaseForm{{forloop.counter}}.submit()" type="submit" ><b>+</b></span>
+                    </form>
+
+                    <div class="pr-4" style="color: #7d879c">{{ order.quantity }}</div>
+
+                    {% if order.quantity == 1 %}
+
+                      <span  type="submit" style="cursor: not-allowed; pointer-events: all !important;" disabled><b>-</b></span>
+
+                    {% else %}
+                    <form  name="decreaseForm{{forloop.counter}}" action="{% url 'stock:decrease_from_cart' slug=order.product.slug color=order.color size=order.size %}"  method="POST">
+                      {% csrf_token %}
+
+                    <span onclick="decreaseForm{{forloop.counter}}.submit()" type="submit"><b>-</b></span>
+
+                  </form>
+                  {% endif %}
+
+                  </div>
+                </div>
+          </div>
+        </div>
+        {% endfor %}
+        <!-- <button class="btn btn-outline-accent btn-block" type="button"><i class="czi-loading font-size-base mr-2"></i>Update cart</button> -->
+      </section>
+      <!-- Sidebar-->
+      <aside class="col-lg-4 pt-4 pt-lg-3">
+        <div class="cz-sidebar-static rounded-lg box-shadow-lg ml-lg-auto">
+          <div class="text-center mb-4 pb-3 border-bottom">
+            <h2 class="h6 mb-3 pb-1">Subtotal</h2>
+            
+            {% with order_products.get_total_sum|split:"." as price_decimals %}
+            <h3 class="font-weight-normal">{{price_decimals|first}}
+              {% if price_decimals|last != '0' %}
+                <small>.{{ price_decimals|last }}</small>
+              {% endif %}
+              TND</h3>
+            {% endwith %}
+          
+
+          </div>
+       
+          <a class="btn btn-primary btn-shadow btn-block mt-4" href="{% url 'checkout:checkout_order' %}"><i class="czi-card font-size-lg mr-2"></i>Proceed to Checkout</a>
+        </div>
+      </aside>
+    </div>
+</div>
+
+{% endblock content %} 
+
+
+{% block extra_scripts %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+      var x = document.getElementById("files");
+
+      $("input[name='color']").change(function() {
+          var product = $(this).attr('href');
+          try {
+
+              location.href = product;
+              
+              //$('#error').hide();
+          } catch (err) {
+              $('#error').html(err);
+              $('#error').show();
+          }
+          return false;
+      });
+      
+      // get the alert message
+      var msg = "{{message_alert.message}}";
+      if(msg.length > 0){
+          $('#btnTrigger').click();
+      }
+  
+  });
+</script>
+{% endblock extra_scripts %}

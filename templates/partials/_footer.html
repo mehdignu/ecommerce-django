@@ -1,0 +1,233 @@
+{% load cart_template_tags %}
+{% load crispy_forms_tags %}
+{% load static %}
+
+
+
+<!-- Footer-->
+<!-- Footer-->
+<footer class="bg-dark pt-5">
+    <div class="container">
+        <div class="row pb-2">
+            <div class="col-md-4 col-sm-6">
+                <div class="widget widget-links widget-light pb-2 mb-4">
+                    <h3 class="widget-title text-light">Shop Categories</h3>
+                    <ul class="widget-list">
+
+                    {% with categories=context|get_categories  %}
+                        {% for category, key in categories.items %}
+                            <li class="widget-list-item"><a class="widget-list-link" href="{% url 'pages:products' category=category %}">{{category}}</a></li>
+
+                        {% endfor %}
+                    {% endwith %}
+                </ul>
+
+                   
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-6">
+                <div class="widget widget-links widget-light pb-2 mb-4">
+                    <h3 class="widget-title text-light">Account &amp; shipping info</h3>
+                    <ul class="widget-list">
+                        <li class="widget-list-item"><a class="widget-list-link" href="{% url 'pages:shipping' %}">Shipping rates &amp; Refunds</a></li>
+                    </ul>
+                </div>
+                <div class="widget widget-links widget-light pb-2 mb-4">
+                    <h3 class="widget-title text-light">About us</h3>
+                    <ul class="widget-list">
+                        <li class="widget-list-item"><a class="widget-list-link" href="{% url 'pages:about' %}">About women</a></li>
+                        <li class="widget-list-item"><a class="widget-list-link" href="{% url 'pages:contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            {% if not checkout %}
+            <div class="col-md-4">
+
+
+                <div class="widget pb-2 mb-4">
+                    <h3 class="widget-title text-light pb-1">Stay informed</h3>
+                    <form class="" action="{% url 'marketing:subscribe' %}" method="post">
+                        <div class="input-group input-group-overlay flex-nowrap">
+                            <div class="input-group-prepend-overlay"><span class="input-group-text text-muted font-size-base"><i class="czi-mail"></i></span></div>
+                            {% csrf_token %}
+
+                            {% show_subscription %}
+                                
+                            <div class="input-group-append">
+                                <button class="btn btn-primary" type="submit" name="subscribe">Subscribe*</button>
+                            </div>
+                        </div>
+                        <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+                        <div style="position: absolute; left: -5000px;" aria-hidden="true">
+                            <input class="cz-subscribe-form-antispam" type="text" name="b_c7103e2c981361a6639545bd5_29ca296126" tabindex="-1">
+                        </div><small class="form-text text-light opacity-50">*Subscribe to our newsletter to receive early discount offers, updates and new products info.</small>
+                        <div class="subscribe-status"></div>
+                    </form>
+                </div>
+{%endif%}
+            </div>
+        </div>
+    </div>
+    <div class="pt-5 bg-darker">
+        <div class="container">
+            <div class="row pb-3">
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="media"><i class="czi-rocket text-primary" style="font-size: 2.25rem;"></i>
+                        <div class="media-body pl-3">
+                            <h6 class="font-size-base text-light mb-1">Fast and free delivery</h6>
+                            <p class="mb-0 font-size-ms text-light opacity-50">Free delivery for all orders over $200</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="media"><i class="czi-currency-exchange text-primary" style="font-size: 2.25rem;"></i>
+                        <div class="media-body pl-3">
+                            <h6 class="font-size-base text-light mb-1">Money back guarantee</h6>
+                            <p class="mb-0 font-size-ms text-light opacity-50">We return money within 30 days</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="media"><i class="czi-support text-primary" style="font-size: 2.25rem;"></i>
+                        <div class="media-body pl-3">
+                            <h6 class="font-size-base text-light mb-1">24/7 customer support</h6>
+                            <p class="mb-0 font-size-ms text-light opacity-50">Friendly 24/7 customer support</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-4">
+                    <div class="media"><i class="czi-card text-primary" style="font-size: 2.25rem;"></i>
+                        <div class="media-body pl-3">
+                            <h6 class="font-size-base text-light mb-1">Secure online payment</h6>
+                            <p class="mb-0 font-size-ms text-light opacity-50">We possess SSL / Secure сertificate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="hr-light pb-4">
+            <div class="row pb-2">
+                <div class="col-md-6 text-center text-md-left">
+                    <div class="text-nowrap mb-4">
+                        <a class="d-inline-block align-middle mt-n1 mr-3" href="/"><img class="d-block" width="117" src="{% static 'img/women-logo-light.png' %}" alt="Cartzilla" /></a>
+                        
+                    </div>
+                  
+                </div>
+                <div class="col-md-6 text-center text-md-right">
+                    <div class="mb-3">
+                        <a class="social-btn sb-light sb-facebook ml-2 mb-2" target="_blank" href="https://www.facebook.com/womensfashiontn"><i class="czi-facebook"></i></a>
+                        <a class="social-btn sb-light sb-instagram ml-2 mb-2" target="_blank" href="https://www.instagram.com/wmn_tn"><i class="czi-instagram"></i></a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pb-4 font-size-xs text-light opacity-50 text-center text-md-left">© All rights reserved <script>document.write(new Date().getFullYear())</script> Women.<br> Made with <i class="navbar-tool-icon material-icons" style="color: #FE4344; font-size: 15px;">favorite</i> in Berlin</a></div>
+        </div>
+    </div>
+</footer>
+
+<!-- Modal markup -->
+<div class="modal" id="shareModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Share your Wishlist</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center h-50 d-flex flex-column  my-0 w-100">
+
+
+            <!-- App Store button -->
+            <a href="#" class="btn-market" role="button">
+                <span class="material-icons" style="color: #3b5998;">
+                    facebook
+                    </span>
+
+                <span class="btn-market-subtitle">Share on</span>
+                <span class="btn-market-title">facebook</span>
+            </a>
+
+            <br>
+
+             <!-- App Store button -->
+             <label>Wishlist URL</label>
+             <input type="input" id="linkUrl" />
+            <small style="text-align: left;" id="copyLink" class="form-text text-muted"></small>
+          
+
+        </div>
+       
+      </div>
+    </div>
+  </div>
+  
+  {% if not checkout %}
+
+<!-- Toolbar for handheld devices-->
+<div class="cz-handheld-toolbar">
+    <div class="d-table table-fixed w-100">
+        {% with favorites_count=request|count_favorites  %}
+
+        {% if request.get_full_path == "/wishlist/" and favorites_count > 0 %}
+
+        <a onclick="getShareLink();" class="d-table-cell cz-handheld-toolbar-item" data-toggle="modal" data-target="#shareModal" ><span class="cz-handheld-toolbar-icon">
+            
+
+              <i id="favBarMobile" class="czi-share-alt" style="color: #FE4344;"></i>
+            
+            
+            </span><span class="cz-handheld-toolbar-label">Share Wishlist</span>
+
+        </a>
+
+        {% else %}
+
+        <a class="d-table-cell cz-handheld-toolbar-item" href="{% url 'pages:wishlist' %}"><span class="cz-handheld-toolbar-icon">
+            
+            {% if favorites_count > 0 %}
+
+              <i id="favBarMobile" class="material-icons md-48" style="color: #FE4344;">favorite</i>
+            
+              {% else %}
+
+              <i id="favBarMobile" class="material-icons md-48" style="color: none;">favorite_border</i>
+            
+              {%endif%}
+            
+    
+            </span><span class="cz-handheld-toolbar-label">Wishlist</span>
+
+        </a>
+
+        {% endif %}
+        
+        {% endwith %}
+
+        
+    <a class="d-table-cell cz-handheld-toolbar-item" href="#navbarCollapse" data-toggle="collapse" onclick="window.scrollTo(0, 0)">
+        
+        <span class="cz-handheld-toolbar-icon"><i class="czi-menu"></i></span><span class="cz-handheld-toolbar-label">Menu</span>
+    
+    </a>
+
+            <a class="d-table-cell cz-handheld-toolbar-item" href="{% url 'order:cart' %}"><span class="cz-handheld-toolbar-icon"><i class="czi-cart"></i>
+                
+                {% with cart_count=request|cart_item_count  %}
+
+                        {% if cart_count > 0 %}
+
+                <span class="badge badge-primary badge-pill ml-1">{{ cart_count }}</span>
+                        
+                       
+                        {%endif%}
+                        {% endwith %}
+            
+            </span><span class="cz-handheld-toolbar-label">Your Cart</span></a>
+    </div>
+</div>
+<!-- Back To Top Button--><a class="btn-scroll-top" href="#top" data-scroll><span class="btn-scroll-top-tooltip text-muted font-size-sm mr-2">Top</span><i class="btn-scroll-top-icon czi-arrow-up">   </i></a>
+
+
+{% endif %}
